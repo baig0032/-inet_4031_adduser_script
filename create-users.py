@@ -2,70 +2,71 @@
 
 # INET4031
 # Your Name
-# Data Created
+# Date Created
 # Date Last Modified
 
-#REPLACE THIS COMMENT - identify what each of these imports is for.
+# Importing required modules:
+# os - to run system commands
+# re - for regular expression matching
+# sys - to read input from stdin
 import os
 import re
 import sys
 
-#YOUR CODE SHOULD HAVE NONE OF THE INSTRUCTORS COMMENTS REMAINING WHEN YOU ARE FINISHED
-#PLEASE REPLACE INSTRUCTOR "PROMPTS" WITH COMMENTS OF YOUR OWN
-
 def main():
+    # Read each line from the input file
     for line in sys.stdin:
 
-        #REPLACE THIS COMMENT - this "regular expression" is searching for the presence of a character - what is it and why?
-        #The important part is WHY it is looking for a particular characer - what is that character being used for?
-        match = re.match("^#",line)
+        # Check if the line starts with "#" (a comment)
+        # Lines starting with "#" are skipped because they are not user entries
+        match = re.match("^#", line)
 
-        #REPLACE THIS COMMENT - why is the code doing this?
+        # Split the line into fields using ":" as delimiter
+        # Each line should contain: username:password:last:first:groups
         fields = line.strip().split(':')
 
-        #REPLACE THESE COMMENTS with a single comment describing the logic of the IF 
-        #what would an appropriate comment be for describing what this IF statement is checking for?
-        #what happens if the IF statement evaluates to true?
-        #how does this IF statement rely on what happened in the prior two lines of code? The match and fields lines.
-        #the code clearly shows that the variables match and the length of fields is being checked for being != 5  so why is it doing that?
+        # Skip the line if it is a comment or if it does not have exactly 5 fields
+        # This prevents processing invalid lines
         if match or len(fields) != 5:
             continue
 
-        #REPLACE THIS COMMENT - what is the purpose of the next three lines. How does it relate to what is stored in the passwd file?
-        username = fields[0]
-        password = fields[1]
-        gecos = "%s %s,,," % (fields[3],fields[2])
+        # Extract user information from the fields
+        username = fields[0]                  # system username
+        password = fields[1]                  # user password
+        gecos = "%s %s,,," % (fields[3],fields[2])  # full name in "First Last" format, used by adduser
 
-        #REPLACE THIS COMMENT - why is this split being done?
+        # Split the groups field into a list of groups
+        # A user may belong to multiple groups separated by commas
         groups = fields[4].split(',')
 
-        #REPLACE THIS COMMENT - what is the point of this print statement?
+        # Dry-run print: indicate that we are creating an account
         print("==> Creating account for %s..." % (username))
-        #REPLACE THIS COMMENT - what is this line doing?  What will the variable "cmd" contain.
-        cmd = "/usr/sbin/adduser --disabled-password --gecos '%s' %s" % (gecos,username)
 
-        #REMOVE THIS COMMENT AFTER YOU UNDERSTAND WHAT TO DO - these statements are currently "commented out" as talked about in class
-        #The first time you run the code...what should you do here?  If uncommented - what will the os.system(cmd) statemetn attempt to do?
-        #print(cmd)
-        #os.system(cmd)
+        # Command to add the user account without setting a password yet
+        cmd = "/usr/sbin/adduser --disabled-password --gecos '%s' %s" % (gecos, username)
+        # Dry run: print the command instead of executing it
+        # print(cmd)
+        # os.system(cmd)
 
-        #REPLACE THIS COMMENT - what is the point of this print statement?
+        # Dry-run print: indicate that we are setting the password
         print("==> Setting the password for %s..." % (username))
-        #REPLACE THIS COMMENT - what is this line doing?  What will the variable "cmd" contain. You'll need to lookup what these linux commands do.
-        cmd = "/bin/echo -ne '%s\n%s' | /usr/bin/sudo /usr/bin/passwd %s" % (password,password,username)
 
-        #REMOVE THIS COMMENT AFTER YOU UNDERSTAND WHAT TO DO - these statements are currently "commented out" as talked about in class
-        #The first time you run the code...what should you do here?  If uncommented - what will the os.system(cmd) statemetn attempt to do?
-        #print(cmd)
-        #os.system(cmd)
+        # Command to set the password for the user
+        # This uses echo and pipe to feed the password to the passwd command
+        cmd = "/bin/echo -ne '%s\n%s' | /usr/bin/sudo /usr/bin/passwd %s" % (password, password, username)
+        # Dry run: print the command instead of executing it
+        # print(cmd)
+        # os.system(cmd)
 
+        # Assign the user to each group listed
         for group in groups:
-            #REPLACE THIS COMMENT with one that answers "What is this IF statement looking for and why? If group !='-' what happens?"
+            # Skip group assignment if the group field is "-" (indicating no group)
             if group != '-':
-                print("==> Assigning %s to the %s group..." % (username,group))
-                cmd = "/usr/sbin/adduser %s %s" % (username,group)
-                #print(cmd)
-                #os.system(cmd)
+                print("==> Assigning %s to the %s group..." % (username, group))
+                cmd = "/usr/sbin/adduser %s %s" % (username, group)
+                # Dry run: print the command instead of executing it
+                # print(cmd)
+                # os.system(cmd)
 
 if __name__ == '__main__':
     main()
