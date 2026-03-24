@@ -22,6 +22,7 @@ def main():
         match = re.match("^#", line)
 
         # Split the line into fields using ":" as delimiter
+
         # Each line should contain: username:password:last:first:groups
         fields = line.strip().split(':')
 
@@ -45,8 +46,8 @@ def main():
         # Command to add the user account without setting a password yet
         cmd = "/usr/sbin/adduser --disabled-password --gecos '%s' %s" % (gecos, username)
         # Dry run: print the command instead of executing it
-        # print(cmd)
-        # os.system(cmd)
+        #print(cmd)
+        os.system(cmd)
 
         # Dry-run print: indicate that we are setting the password
         print("==> Setting the password for %s..." % (username))
@@ -55,8 +56,8 @@ def main():
         # This uses echo and pipe to feed the password to the passwd command
         cmd = "/bin/echo -ne '%s\n%s' | /usr/bin/sudo /usr/bin/passwd %s" % (password, password, username)
         # Dry run: print the command instead of executing it
-        # print(cmd)
-        # os.system(cmd)
+        #print(cmd)
+        os.system(cmd)
 
         # Assign the user to each group listed
         for group in groups:
@@ -65,8 +66,8 @@ def main():
                 print("==> Assigning %s to the %s group..." % (username, group))
                 cmd = "/usr/sbin/adduser %s %s" % (username, group)
                 # Dry run: print the command instead of executing it
-                # print(cmd)
-                # os.system(cmd)
+                #print(cmd)
+                os.system(cmd)
 
 if __name__ == '__main__':
     main()
